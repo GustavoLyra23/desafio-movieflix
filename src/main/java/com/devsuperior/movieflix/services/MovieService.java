@@ -7,7 +7,9 @@ import com.devsuperior.movieflix.repositories.MovieRepository;
 import com.devsuperior.movieflix.repositories.ReviewRepository;
 import com.devsuperior.movieflix.services.exceptions.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +40,9 @@ public class MovieService {
 
     @Transactional(readOnly = true)
     public Page<MovieCardDTO> findByGenre(Long genreId, Pageable pageable) {
-
-        return genreId == null || genreId <= 0 ?
-                movieRepository.findAll(pageable).map(MovieCardDTO::new) :
+        var page = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("title"));
+        return (genreId == null || genreId <= 0) ?
+                movieRepository.findAll(page).map(MovieCardDTO::new) :
                 movieRepository.findByGenre_Id(genreId, pageable).map(MovieCardDTO::new);
     }
 }
